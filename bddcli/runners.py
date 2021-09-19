@@ -1,8 +1,13 @@
 import os
 import abc
 import sys
-import subprocess as sp
 from os import path
+
+from .platform_ import (
+    bootstrapper_name,
+    form_bootstrapper_path,
+    popen
+)
 
 
 class Runner(metaclass=abc.ABCMeta):
@@ -14,10 +19,7 @@ class Runner(metaclass=abc.ABCMeta):
 class SubprocessRunner(Runner):
 
     def _findbindir(self):
-        if os.name == "nt":
-            bootstrapper = 'bddcli_bootstrapper'
-        else:
-            bootstrapper = 'bddcli-bootstrapper'
+        bootstrapper = bootstrapper_name()
         for d in sys.path:
             try:
                 if bootstrapper in os.listdir(d):
@@ -28,19 +30,13 @@ class SubprocessRunner(Runner):
 
     @property
     def bootstrapper(self):
-        if os.name == "nt":
-            bootstrapper = 'bddcli_bootstrapper'
-        else:
-            bootstrapper = 'bddcli-bootstrapper'
+        bootstrapper = bootstrapper_name()
         if 'VIRTUAL_ENV' in os.environ:
             bindir = path.join(os.environ['VIRTUAL_ENV'], 'bin')
         else:  # pragma: no cover
             bindir = self._findbindir()
 
-        if os.name == "nt":
-            return path.join(bindir, bootstrapper, "__init__.py")
-        else:
-            return path.join(bindir, bootstrapper)
+        return form_bootstrapper_path(bindir, bootstrapper)
 
     def __init__(self, application, environ=None):
         self.application = application
@@ -57,27 +53,5 @@ class SubprocessRunner(Runner):
         if arguments:
             command += arguments
 
-        if os.name == "nt":
-            # On Windows, the specified env must include a valid SystemRoot
-            # Use a current value
-            if environ is not None:
-                environ["SystemRoot"] = os.environ["SystemRoot"]
-            process = sp.Popen(
-                ' '.join(command),
-                stdout=sp.PIPE,
-                stderr=sp.PIPE,
-                shell=True,
-                env=environ,
-                **kw,
-            )
-        else:
-            process = sp.Popen(
-                ' '.join(command),
-                stdout=sp.PIPE,
-                stderr=sp.PIPE,
-                shell=True,
-                env=environ,
-                preexec_fn=os.setpgrp,
-                **kw,
-            )
+        process = popen(command, environ, **kw)
         return process
