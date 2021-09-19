@@ -1,4 +1,5 @@
 import os
+import pytest
 
 from bddcli import Given, stdout, Application, when
 
@@ -10,6 +11,8 @@ def foo():  # pragma: no cover
 app = Application('foo', 'tests.test_workingdirectory:foo')
 
 
+@pytest.mark.skipif(os.name == "nt", reason="Windows doesn't have /tmp\
+    directory")
 def test_working_directory():
     with Given(app):
         assert f'{os.getcwd()}\n' == stdout

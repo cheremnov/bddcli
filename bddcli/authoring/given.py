@@ -1,5 +1,6 @@
 import os
 import signal
+import subprocess as sp
 
 from ..context import Context
 from ..calls import FirstCall, AlteredCall, Call
@@ -24,7 +25,13 @@ class Given(Story, Context):
 
     def kill(self, s=signal.SIGTERM):
         call = self.current_call
-        os.killpg(os.getpgid(call.process.pid), s)
+        if os.name == "nt":
+            # On Windows, os module can't kill processes by group
+            # Kill all children indiscriminately instead
+            sp.call(['taskkill', '/T', '/F', '/PID',
+                    str(call.process.pid)])
+        else:
+            os.killpg(os.getpgid(call.process.pid), s)
 
     def wait(self, stdin=None, timeout=None):
         call = self.current_call

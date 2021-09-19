@@ -17,6 +17,8 @@ def baz():  # pragma: no cover
 app = Application('foo', 'tests.test_manipulators:baz')
 
 
+@pytest.mark.skipif(os.name == "nt", reason="On Windows, environment isn't"
+                    "emptied")
 def test_dict_manipulators():
     with Given(app, environ={'bar': 'baz'}):
         assert stdout == 'bar: baz\n'

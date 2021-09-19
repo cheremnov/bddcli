@@ -1,3 +1,5 @@
+import os
+import pytest
 import signal
 import time
 
@@ -24,6 +26,8 @@ def foo():  # pragma: no cover
 app = Application('foo', 'tests.test_signal:foo')
 
 
+@pytest.mark.skipif(os.name == "nt", reason="Windows doesn't use Unix"
+                    "signals")
 def test_signal():
     with Given(app, nowait=True) as s:
         # Wait some moments

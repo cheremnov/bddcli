@@ -1,4 +1,5 @@
 import os
+import pytest
 
 from bddcli import Given, stdout, Application, when, given
 
@@ -13,6 +14,8 @@ def foos():  # pragma: no cover
 app = Application('foo', 'tests.test_environ:foos')
 
 
+@pytest.mark.skipif(os.name == "nt", reason="On Windows, environment isn't"
+                    "emptied")
 def test_environ():
     with Given(app, environ={'bar': 'baz'}):
         assert stdout == 'bar: baz\n'
