@@ -36,7 +36,7 @@ jobs:
     - name: Coveralls
       run: coveralls --service=github
       env:
-        github-token: ${{ secrets.GITHUB_TOKEN }}
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   coveralls-finish:
     name: Coveralls finish
@@ -54,7 +54,7 @@ jobs:
     - name: Coveralls Finished
       run: coveralls --service=github --finish
       env:
-        github-token: ${{ secrets.GITHUB_TOKEN }}
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   release:
     name: Github Release
