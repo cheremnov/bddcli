@@ -35,9 +35,8 @@ jobs:
       run: make coverage
     - name: Coveralls
       run: coveralls --service=github
-      env:
-        COVERALLS_REPO_TOKEN: ${{ secrets.COVERALLS_REPO_TOKEN }}
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        github-token: ${{ secrets.GITHUB_TOKEN }}
 
   coveralls-finish:
     name: Coveralls finish
@@ -54,8 +53,8 @@ jobs:
         python -m pip install coveralls
     - name: Coveralls Finished
       run: coveralls --service=github --finish
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        github-token: ${{ secrets.GITHUB_TOKEN }}
 
   release:
     name: Github Release
