@@ -5,8 +5,7 @@ name: Build
 
 on:
   push:
-    branches: [ master ]
-    tags: [ 'v*' ]
+    branches: [ master, githubactions ]
 
   pull_request:
     branches: [ master ]
@@ -34,10 +33,6 @@ jobs:
       run: make lint 
     - name: Test with pytest
       run: make coverage
-    - name: Coveralls
-      run: coveralls
-      env:
-        COVERALLS_REPO_TOKEN: ${{ secrets.COVERALLS_REPO_TOKEN }}
 
   coveralls-finish:
     name: Coveralls finish
@@ -52,10 +47,6 @@ jobs:
       run: |
         python -m pip install --upgrade pip
         python -m pip install coveralls
-    - name: Coveralls Finished
-      run: coveralls --finish
-      env:
-        GITHUB_TOKEN: ${{ secrets.PAT }}
 
   release:
     name: Github Release
@@ -69,7 +60,7 @@ jobs:
       id: create_release
       uses: actions/create-release@v1
       env:
-        GITHUB_TOKEN: ${{ secrets.PAT }}
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         tag_name: ${{ github.ref }}
         release_name: ${{ github.ref }}
